@@ -41,7 +41,7 @@ const MonthlyReports: React.FC = () => {
       setYAxis(res.map((item: MonthlyReport) => item.done));
     }
     settingData();
-  }, []);
+  }, [partName]);
 
   const renderAccordionButton = (monthDetails: MonthlyReport) => (
     <div className="accordion-button heading">

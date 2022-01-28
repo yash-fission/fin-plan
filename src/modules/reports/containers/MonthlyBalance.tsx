@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { getAllMonthBalance } from "../reportService";
 import WrapperDiv from "../../main/components/WrapperDiv";
@@ -14,13 +14,13 @@ const MonthlyBalance: React.FC = () => {
   const [data, setData] = useState([]);
   let { partName }: { partName: string } = useParams();
 
+  const populateData = useCallback(async () => {
+    setData(await getAllMonthBalance(partName));
+  }, [partName]);
+
   useEffect(() => {
     populateData();
-  }, []);
-
-  const populateData = async () => {
-    setData(await getAllMonthBalance(partName));
-  };
+  }, [populateData]);
 
   const renderData = () => {
     const columnKeys = Object.keys(data[0]).slice(1);

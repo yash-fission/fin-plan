@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import Details from "./components/Details";
 import Table from "./components/Table";
@@ -28,15 +28,18 @@ const Parts: React.FC = () => {
   const [monthBal, setMonthBal] = useState({ balance: 0 });
   let { partName }: Params = useParams();
 
+  const populateData = useCallback(
+    async (p?: string) => {
+      setData(await getTargetData(partName));
+      setTable(await getTransactionTable(partName));
+      setMonthBal(await getMonthBal(partName));
+    },
+    [partName]
+  );
+
   useEffect(() => {
     populateData(partName);
-  }, [partName]);
-
-  const populateData = async (p?: string) => {
-    setData(await getTargetData(partName));
-    setTable(await getTransactionTable(partName));
-    setMonthBal(await getMonthBal(partName));
-  };
+  }, [partName, populateData]);
 
   const transactionAdded = (obj: TransactionInterface) => {
     addTransaction(data.id, obj, data);

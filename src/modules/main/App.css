@@ -1,0 +1,53 @@
+.nav-style {
+  text-transform: none;
+  width: 100%;
+  background-color: #dfdfdf;
+}
+
+.nav-style a {
+  list-style-type: none;
+  display: inline-block;
+  padding: 15px 25px;
+}
+
+.App {
+  text-align: center;
+}
+
+.App-header {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+}
+
+input {
+  margin-right: 20px;
+}
+
+table,
+td,
+th {
+  border: 1px solid;
+  padding: 15px;
+  border-collapse: collapse;
+  margin: 10px;
+}
+
+thead {
+  background-color: #dfdfdf;
+  color: #282c34;
+}
+
+.page-layout {
+  text-align: center;
+  padding: 3%;
+  max-width: 1024px;
+  margin: auto;
+}
+
+.table-layout {
+  margin: 20px auto;
+}

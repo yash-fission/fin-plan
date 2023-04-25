@@ -52,11 +52,12 @@ const App: React.FC = () => {
 
   const calculate = () => {
     let netSalary: number = salary - 21600 - 2500;
-    let incomeAfterHRA: number = Math.round(netSalary * 0.84);
+    let incomeAfterHRA: number = Math.round(salary * 0.8) - 21600 - 2500;
     let tax = 0;
     if (incomeAfterHRA > 500000) {
-      let taxableIncome: number = incomeAfterHRA - 200000;
+      let taxableIncome: number = incomeAfterHRA - 250000;
       taxableIncome -= deduction;
+      console.log(taxableIncome, incomeAfterHRA);
       tax += 12500;
       if (taxableIncome > 500000) {
         let slab = taxableIncome - 500000;

@@ -4,7 +4,7 @@ interface APIBody {
 }
 
 export const graphQLAPI = async (body: APIBody) => {
-  let res = await fetch("https://fin-plan-backend.herokuapp.com/graphql", {
+  let res = await fetch("http://localhost:5015/graphql", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),

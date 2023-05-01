@@ -11,7 +11,7 @@
 }
 
 .App {
-  text-align: center;
+  /* text-align: center; */
 }
 
 .App-header {
@@ -23,8 +23,81 @@
   font-size: calc(10px + 2vmin);
 }
 
+.app-heading {
+  font-size: 40px;
+  margin: 30px auto;
+  font-weight: 700;
+  text-align: center;
+}
+
+.container {
+  display: flex;
+  padding: 20px;
+  gap: 50px;
+}
+
+.left-panel {
+  width: calc(50% + 50px);
+}
+
+.right-panel {
+  width: calc(50% - 50px);
+}
+
+.input-wrapper {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px 0px;
+  align-items: center;
+}
+
+.label {
+  font-size: 24px;
+}
+
+.input-box {
+  background-color: #dfdfdf;
+  border-radius: 10px;
+  padding: 5px 10px;
+  color: #282c34;
+}
+
 input {
-  margin-right: 20px;
+  min-width: 100px;
+  height: 23px;
+  background-color: #dfdfdf;
+  border: none;
+  font-size: large;
+}
+
+input:focus {
+  outline: none;
+}
+
+button {
+  padding: 8px 12px;
+  font-size: large;
+  border-radius: 12px;
+  border: none;
+}
+
+.button-wrapper {
+  text-align: center;
+}
+
+.button-wrapper > button {
+  width: 200px;
+  height: 40px;
+}
+
+.success {
+  background-color: #65b66d;
+  color: #dfdfdf;
+}
+
+.primary {
+  background-color: #1da1f2;
+  color: #dfdfdf;
 }
 
 table,

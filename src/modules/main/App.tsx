@@ -1,11 +1,11 @@
-import React, { useEffect } from "react";
+import { FC, lazy, useEffect, useState } from "react";
 
 import { getIncomeBreakdown, setMonthlyBal } from "./baseApiService";
 import IncomeBreakdown from "./components/income-breakdown";
 import "./App.css";
 
 const preloadWhenLazy = (factory: any) => {
-  let Component: any = React.lazy(factory);
+  let Component: any = lazy(factory);
   Component.preload = factory;
   return Component;
 };
@@ -22,17 +22,27 @@ const SummaryReport = preloadWhenLazy(
   () => import("../reports/containers/SummaryReport")
 );
 
-const App: React.FC = () => {
-  const [salary, setSalary] = React.useState(
+const App: FC = () => {
+  const [salary, setSalary] = useState(
     parseInt(localStorage.getItem("salary") + "") || 0
   );
-  const [deduction, setDeduction] = React.useState(
+  const [deduction, setDeduction] = useState(
     parseInt(localStorage.getItem("deduction") + "") || 0
   );
-  const [tiat, setTiat] = React.useState(
+  const [tiat, setTiat] = useState(
     parseInt(localStorage.getItem("tiat") + "") || 0
   );
-  const [tableData, setTableData] = React.useState([]);
+  const [tableData, setTableData] = useState([]);
+
+  const [isCalculated, setIsCalculated] = useState(false);
+
+  const [isMetro, setIsMetro] = useState(false);
+
+  const [breakdownDetails, setBreakdownDetails] = useState({
+    hra: 0,
+    "80c": 150000,
+    nps: 50000,
+  });
 
   const populateData = async () => {
     const target = await getIncomeBreakdown();
@@ -51,13 +61,22 @@ const App: React.FC = () => {
   }, []);
 
   const calculate = () => {
+    setIsCalculated(true);
+    if (salary <= 500000) {
+      setTiat(salary);
+      setBreakdownDetails({ hra: 0, nps: 0, "80c": 0 });
+      setDeduction(0);
+      return;
+    }
     let netSalary: number = salary - 21600 - 2500;
-    let incomeAfterHRA: number = Math.round(salary * 0.8) - 21600 - 2500;
+    let hraPercent = isMetro ? 0.25 : 0.2;
+    let hra = Math.round(salary * hraPercent);
+    let incomeAfterHRA: number = netSalary - hra;
     let tax = 0;
     if (incomeAfterHRA > 500000) {
-      let taxableIncome: number = incomeAfterHRA - 250000;
+      let taxableIncome: number =
+        incomeAfterHRA - breakdownDetails["80c"] - breakdownDetails.nps - 50000;
       taxableIncome -= deduction;
-      console.log(taxableIncome, incomeAfterHRA);
       tax += 12500;
       if (taxableIncome > 500000) {
         let slab = taxableIncome - 500000;
@@ -69,10 +88,12 @@ const App: React.FC = () => {
         tax += slab * 0.3;
       }
     }
-    let amount = netSalary - Math.round(tax);
+    let cess = Math.round(tax * 0.04);
+    let amount = netSalary - 21600 - Math.round(tax) - cess;
     setMonthlyBal(amount, tableData);
     populateData();
     setTiat(amount);
+    setBreakdownDetails({ ...breakdownDetails, hra });
     localStorage.setItem("tiat", amount + "");
     localStorage.setItem("salary", salary + "");
     localStorage.setItem("deduction", deduction + "");
@@ -80,46 +101,134 @@ const App: React.FC = () => {
 
   return (
     <div className="App">
-      <header className="App-header">
-        <div>
-          <span>Total CTC: </span>
-          {
-            //@ts-ignore
-            <input
-              type="text"
-              value={salary}
-              name="ctc"
-              data-test="salary-input"
-              onChange={(e) => setSalary(parseInt(e.target.value))}
-            />
-          }
+      {/* <header className="App-header"> */}
+      <div className="app-heading">Your Financial Planner</div>
+      <div className="container">
+        <div className="left-panel">
+          <div className="ctc">
+            <div className="input-wrapper">
+              <span className="label">Enter your CTC: </span>
+              <div className="input-box">
+                {
+                  //@ts-ignore
+                  <input
+                    type="number"
+                    value={salary}
+                    name="ctc"
+                    data-test="salary-input"
+                    onChange={(e) => setSalary(parseInt(e.target.value))}
+                  />
+                }
+                <span data-test="tiat-annual">Rs.</span>
+              </div>
+            </div>
+
+            <div className="button-wrapper">
+              <button
+                disabled={salary ? false : true}
+                data-test="calculate-button"
+                className="success"
+                onClick={calculate}
+              >
+                Calculate
+              </button>
+            </div>
+          </div>
+          {isCalculated && (
+            <>
+              <div className="input-wrapper">
+                <span className="label">Total Income After Tax: </span>
+                <span className="label" data-test="tiat-annual">
+                  {tiat}Rs.
+                </span>
+              </div>
+              <div className="input-wrapper">
+                <span className="label">Monthly Income After Tax: </span>
+                <span className="label" data-test="tiat-annual">
+                  {Math.round(tiat / 12)}Rs.
+                </span>
+              </div>
+              <IncomeBreakdown tableData={tableData} />
+            </>
+          )}
         </div>
-        <div>
-          <span>Extra Deductions: </span>
-          <input
-            value={deduction}
-            name="deduction"
-            data-test="extra-deduction"
-            onChange={(e) => setDeduction(parseInt(e.target.value))}
-          />
-        </div>
-        <button
-          disabled={salary ? false : true}
-          data-test="calculate-button"
-          onClick={calculate}
-        >
-          Calculate
-        </button>
-        <div>
-          <span>Total Income After Tax: </span>
-          <span data-test="tiat-annual">{tiat}Rs.</span>
-        </div>
-        <div>
-          <span>Total Income After Tax: </span>
-          <span data-test="tiat-month">{Math.round(tiat / 12)}Rs.</span>/months
-        </div>
-        <IncomeBreakdown tableData={tableData} />
-      </header>
+        {isCalculated && (
+          <div className="right-panel">
+            <div className="input-wrapper">
+              <span className="label">HRA: </span>
+              <div className="input-box">
+                <input
+                  type="text"
+                  value={breakdownDetails.hra}
+                  onChange={(e) =>
+                    setBreakdownDetails({
+                      ...breakdownDetails,
+                      hra: parseInt(e.target.value),
+                    })
+                  }
+                />
+                <span data-test="tiat-annual">Rs.</span>
+              </div>
+            </div>
+            <div className="input-wrapper">
+              <span className="label">80C: </span>
+              <div className="input-box">
+                <input
+                  type="text"
+                  value={breakdownDetails["80c"]}
+                  onChange={(e) =>
+                    setBreakdownDetails({
+                      ...breakdownDetails,
+                      "80c": parseInt(e.target.value),
+                    })
+                  }
+                />
+                <span data-test="tiat-annual">Rs.</span>
+              </div>
+            </div>
+            <div className="input-wrapper">
+              <span className="label">NPS: </span>
+              <div className="input-box">
+                <input
+                  type="text"
+                  value={breakdownDetails.nps}
+                  onChange={(e) =>
+                    setBreakdownDetails({
+                      ...breakdownDetails,
+                      nps: parseInt(e.target.value),
+                    })
+                  }
+                />
+                <span data-test="tiat-annual">Rs.</span>
+              </div>
+            </div>
+            <div className="input-wrapper">
+              <span className="label">Extra Deductions: </span>
+              <div className="input-box">
+                <input
+                  type="text"
+                  value={deduction}
+                  name="deduction"
+                  data-test="extra-deduction"
+                  onChange={(e) => setDeduction(parseInt(e.target.value))}
+                />
+                <span data-test="tiat-annual">Rs.</span>
+              </div>
+            </div>
+            <div className="button-wrapper">
+              <button
+                disabled={salary ? false : true}
+                data-test="calculate-button"
+                className="primary"
+                onClick={calculate}
+              >
+                Re-Calculate
+              </button>
+            </div>
+          </div>
+        )}
+        {/* </header> */}
+      </div>
     </div>
   );
 };

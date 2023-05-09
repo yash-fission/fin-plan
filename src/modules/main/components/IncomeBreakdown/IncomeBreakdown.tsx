@@ -1,5 +1,6 @@
 import React from "react";
 import { useHistory } from "react-router-dom";
+import "./IncomeBreakdown.css";
 
 interface IncomeBreakdownInterface {
   id: string;
@@ -22,6 +23,7 @@ const IncomeBreakdown: React.FC<Props> = ({ tableData }: Props) => {
 
   return (
     <div>
+      <div className="table-wrapper"></div>
       <h3>Distribution of the Salary</h3>
       <table data-test="table">
         <thead>

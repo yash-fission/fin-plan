@@ -62,7 +62,7 @@
   color: #282c34;
 }
 
-input {
+.input-box input {
   min-width: 100px;
   height: 23px;
   background-color: #dfdfdf;
@@ -123,4 +123,18 @@ thead {
 
 .table-layout {
   margin: 20px auto;
+}
+
+.hra {
+  display: flex;
+  flex-direction: column;
+  align-items: baseline;
+  gap: 20px;
+}
+
+.hra-radio-wrapper {
+  width: 200px;
+  display: flex;
+  font-size: large;
+  justify-content: space-between;
 }

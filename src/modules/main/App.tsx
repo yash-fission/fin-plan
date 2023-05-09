@@ -1,8 +1,9 @@
 import { FC, lazy, useEffect, useState } from "react";
 
 import { getIncomeBreakdown, setMonthlyBal } from "./baseApiService";
-import IncomeBreakdown from "./components/income-breakdown";
+import IncomeBreakdown from "./components/IncomeBreakdown/IncomeBreakdown";
 import "./App.css";
+import Login from "./components/Login/Login";
 
 const preloadWhenLazy = (factory: any) => {
   let Component: any = lazy(factory);
@@ -59,6 +60,14 @@ const App: FC = () => {
     }, 5000);
     populateData();
   }, []);
+
+  useEffect(() => {
+    if (salary) {
+      let hraPercent = isMetro ? 0.25 : 0.2;
+      let hra = Math.round(salary * hraPercent);
+      setBreakdownDetails({ ...breakdownDetails, hra });
+    }
+  }, [isMetro]);
 
   const calculate = () => {
     setIsCalculated(true);
@@ -148,6 +157,7 @@ const App: FC = () => {
                   {Math.round(tiat / 12)}Rs.
                 </span>
               </div>
+              <Login tableData={tableData} />
               <IncomeBreakdown tableData={tableData} />
             </>
           )}
@@ -156,18 +166,40 @@ const App: FC = () => {
           <div className="right-panel">
             <div className="input-wrapper">
               <span className="label">HRA: </span>
-              <div className="input-box">
-                <input
-                  type="text"
-                  value={breakdownDetails.hra}
-                  onChange={(e) =>
-                    setBreakdownDetails({
-                      ...breakdownDetails,
-                      hra: parseInt(e.target.value),
-                    })
-                  }
-                />
-                <span data-test="tiat-annual">Rs.</span>
+              <div className="hra">
+                <div className="hra-radio-wrapper">
+                  <div>
+                    <input
+                      type="radio"
+                      id="metro"
+                      checked={isMetro}
+                      onChange={(e) => setIsMetro(e.target.checked)}
+                    />
+                    <label htmlFor="metro">Metro</label>
+                  </div>
+                  <div>
+                    <input
+                      type="radio"
+                      id="non_metro"
+                      checked={!isMetro}
+                      onChange={(e) => setIsMetro(!e.target.checked)}
+                    />
+                    <label htmlFor="non_metro">Non-Metro</label>
+                  </div>
+                </div>
+                <div className="input-box">
+                  <input
+                    type="text"
+                    value={breakdownDetails.hra}
+                    onChange={(e) =>
+                      setBreakdownDetails({
+                        ...breakdownDetails,
+                        hra: parseInt(e.target.value),
+                      })
+                    }
+                  />
+                  <span data-test="tiat-annual">Rs.</span>
+                </div>
               </div>
             </div>
             <div className="input-wrapper">
